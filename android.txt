@@ -1,0 +1,4 @@
+title=Genius
+author=KropniSoft
+orientation=portrait
+fullscreen=1

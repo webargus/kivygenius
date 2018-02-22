@@ -1,0 +1,57 @@
+#: import utils kivy.utils
+
+<GeniusGridLayout>:
+    rows: 4
+    padding: 10
+    spacing: 10
+
+    Label:
+        font_size: 32
+        text: "G    E    N    I    U    S"
+
+    BoxLayout:
+        spacing: 10
+
+        Button:
+            font_size: 28
+            text: "Start"
+            on_press: root.startGame()
+
+    BoxLayout:
+        spacing: 10
+
+        Button:
+            id: btn_0
+            background_normal: 'red.png'
+            background_down: 'red_pressed.png'
+            on_release: root.btnReleased('0')
+
+        Button:
+            id: btn_1
+            background_normal: 'yellow.png'
+            background_down: 'yellow_pressed.png'
+            on_release: root.btnReleased('1')
+
+    BoxLayout:
+        spacing: 10
+
+        Button:
+            id: btn_2
+            background_normal: 'green.png'
+            background_down: 'green_pressed.png'
+            on_release: root.btnReleased('2')
+
+        Button:
+            id: btn_3
+            background_normal: 'blue.png'
+            background_down: 'blue_pressed.png'
+            on_release: root.btnReleased('3')
+
+
+
+
+
+
+
+
+
