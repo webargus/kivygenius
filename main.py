@@ -16,12 +16,46 @@ class GeniusSounds:
             sound.seek(0)
             sound.volume = 1
 
+class GeniusSequence:
+
+    def __init__(self):
+        self.sequence = []
+        self.ix = 0
+
+    def seed(self):
+        self.sequence.append(randint(0, 3))
+
+    def clear(self):
+        del self.sequence[:]
+        self.ix = 0
+
+    def reset(self):
+        self.ix = 0
+
+    def is_last_seed(self):
+        return self.ix == len(self.sequence)
+
+    def next(self):
+        if self.is_last_seed():
+            return
+        self.ix += 1
+
+    def get(self):
+        if self.is_last_seed():
+            return -1
+        return self.sequence[self.ix]
+
+    def match(self, seed):
+        if self.is_last_seed():
+            return False
+        return self.sequence[self.ix] == int(seed)
 
 class GeniusGridLayout(GridLayout):
 
-    sequence = []
-    isRepeating = False
-    ix = 0
+    def __init__(self, **kwargs):
+        super(GeniusGridLayout, self).__init__(**kwargs)
+        self.seq = GeniusSequence()
+        self.isRepeating = False
 
     def btnReleased(self, btn_id):
 
@@ -32,24 +66,17 @@ class GeniusGridLayout(GridLayout):
         print("btn_id=", btn_id)
         # advance sequence index to next button id if player got it right; add a new id if
         # player reached the end of the sequence; end game if user got it wrong
-        if (len(self.sequence) > 0) and (self.sequence[self.ix] == int(btn_id)):
+        if self.seq.match(btn_id):
             GeniusSounds.sounds[int(btn_id)].play()
-            self.ix = self.ix + 1
-            if self.ix == len(self.sequence):
-                try:
-                    Clock.schedule_once(self.appendTouch, 2)
-                except Exception as e:
-                    print(e)
+            self.seq.next()
+            if self.seq.is_last_seed():
+                Clock.schedule_once(self.appendTouch, 2)
         else:
             GeniusSounds.sounds[-1].play()
             print("Game Over!")
-            self.isPlaying = False
-
 
     def startGame(self):
-        # create sequence list if it wasn't created yet; don't know how to create it
-        # in constructor __init__ without messing with game grid layout
-        del self.sequence[:]
+        self.seq.clear()
 
         # add first color button challenge to player
         self.appendTouch()
@@ -58,34 +85,31 @@ class GeniusGridLayout(GridLayout):
     def appendTouch(self, *dt):
 
         # generate new button random id between 0 and 3 and add it to the sequence
-        self.sequence.append(randint(0, 3))
+        self.seq.seed()
 
         # replay the sequence for the user
-        self.ix = 0
+        self.seq.reset()
         self.isRepeating = True
-        Clock.schedule_interval(self.setBtnState, .5)
+        Clock.schedule_interval(self.replaySequence, .5)
 
-    def setBtnState(self, *dt):
-        if self.ix == len(self.sequence):
-            # end sequence replay and await player clicks
-            Clock.unschedule(self.setBtnState)
+    def replaySequence(self, *dt):
+        if self.seq.is_last_seed():    # no more seeds
+            Clock.unschedule(self.replaySequence)
             # point sequence index back to first button
-            self.ix = 0
+            self.seq.reset()
             # enable player clicks
             self.isRepeating = False
         else:
-            # get current button id in the sequence
-            btn_id = str(self.sequence[self.ix])
             # get btn obj by id
-            btn = self.ids['btn_'+btn_id]
+            btn_id = self.seq.get()
+            btn = self.ids['btn_' + str(btn_id)]
             # toggle btn
             if btn.state == 'normal':
-                GeniusSounds.sounds[int(btn_id)].play()
+                GeniusSounds.sounds[btn_id].play()
                 btn.state = 'down'
             else:
                 btn.state = 'normal'
-                # point index to next button id in sequence
-                self.ix = self.ix + 1
+                self.seq.next()
 
 class Genius(App):
 
