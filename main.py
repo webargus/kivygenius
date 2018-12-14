@@ -1,3 +1,4 @@
+
 import kivy
 kivy.require('1.1.3')
 
@@ -9,7 +10,7 @@ from kivy.uix.gridlayout import GridLayout
 
 class GeniusSounds:
     sounds = [SoundLoader.load('sound_0.wav'), SoundLoader.load('sound_1.wav'), SoundLoader.load('sound_2.wav'),
-              SoundLoader.load('sound_3.wav'), SoundLoader.load('error.mp3')]
+              SoundLoader.load('sound_3.wav'), SoundLoader.load('error.wav')]
 
     def __init__(self):
         for sound in self.sounds:
